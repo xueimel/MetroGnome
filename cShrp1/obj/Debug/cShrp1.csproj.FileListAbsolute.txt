@@ -1,0 +1,10 @@
+C:\Users\Landon Lemieux\visualStudio\cShrp1\cShrp1\bin\Debug\cShrp1.exe.config
+C:\Users\Landon Lemieux\visualStudio\cShrp1\cShrp1\bin\Debug\cShrp1.exe
+C:\Users\Landon Lemieux\visualStudio\cShrp1\cShrp1\bin\Debug\cShrp1.pdb
+C:\Users\Landon Lemieux\visualStudio\cShrp1\cShrp1\obj\Debug\cShrp1.csprojAssemblyReference.cache
+C:\Users\Landon Lemieux\visualStudio\cShrp1\cShrp1\obj\Debug\cShrp1.Form1.resources
+C:\Users\Landon Lemieux\visualStudio\cShrp1\cShrp1\obj\Debug\cShrp1.Properties.Resources.resources
+C:\Users\Landon Lemieux\visualStudio\cShrp1\cShrp1\obj\Debug\cShrp1.csproj.GenerateResource.cache
+C:\Users\Landon Lemieux\visualStudio\cShrp1\cShrp1\obj\Debug\cShrp1.csproj.CoreCompileInputs.cache
+C:\Users\Landon Lemieux\visualStudio\cShrp1\cShrp1\obj\Debug\cShrp1.exe
+C:\Users\Landon Lemieux\visualStudio\cShrp1\cShrp1\obj\Debug\cShrp1.pdb
