@@ -53,6 +53,7 @@ namespace cShrp1
         private void BtnDown_MouseUp(object sender, MouseEventArgs e)
         {
             alterTempo = false;
+
         }
 
         private void BtnDown_MouseDown(object sender, MouseEventArgs e)
@@ -72,12 +73,12 @@ namespace cShrp1
 
         private void Clock_Tick(object sender, EventArgs e)
         {
-            clock.Enabled = true;  
+            //clock.Enabled = true;  
             //makePartyLights();
-            clock.Interval = gnome.Duration;
-            gnome.click();
-            colorChange();
-            flashy.Text = Convert.ToString("BPM: " + gnome.BPM);
+            //clock.Interval = gnome.Duration;
+            //gnome.click();
+            //colorChange();
+            //flashy.Text = Convert.ToString("BPM: " + gnome.BPM);
             
         }
 
@@ -140,6 +141,7 @@ namespace cShrp1
 
         private void BtnStrStp_Click(object sender, EventArgs e)
         {
+            Console.WriteLine("HERE");
             gnome.onOff();
         }
     }

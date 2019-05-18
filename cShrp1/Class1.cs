@@ -3,7 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Media;
-
+using System.Threading;
+using System.Timers;
 
 namespace cShrp1
 {
@@ -13,20 +14,15 @@ namespace cShrp1
         private int bpm;
         private int duration;
         private double old;
-        private bool on = false;
         private bool color1 = false;
-        private System.Timers.Timer clock = new System.Timers.Timer();
+        private System.Timers.Timer clock;
 
         public Metro()
         {
-            bpm = 120;
+            bpm = 60;
             bpmToDuration();
-            clock.Interval = duration;
-        }
-
-        public void onOff()
-        {
-            on = on ? false : true; 
+            clock = new System.Timers.Timer();
+            startClock();
         }
         public int BPM
         {
@@ -39,14 +35,28 @@ namespace cShrp1
             set { duration = value;}
         }
        
+
+        private void startClock()
+        {
+            clock.Interval = duration;
+            clock.AutoReset = true;
+            clock.Elapsed += new ElapsedEventHandler(clockTick);
+            clock.Enabled = false;
+        }
+        private void clockTick(object source, ElapsedEventArgs e)
+        {
+                click();
+                //clock.Interval = duration;
+        }
+        public void onOff()
+        {
+            clock.Enabled = clock.Enabled ? false : true; 
+        }
         public void click()
         {
-            if (on)
-            {
                 SoundPlayer player = new SoundPlayer("C:/Users/Landon Lemieux/Desktop/click.wav");
                 player.PlaySync();
-                flashMe();
-            }
+                //flashMe();
         }
 
         public Color flashMe()
@@ -62,9 +72,7 @@ namespace cShrp1
             double bps = (double)bpm / 60.0;
             double temp = (1000 / bps);
             temp = Math.Round(temp);
-            Console.WriteLine("BPS: " + bps);
             duration = (int)temp;
-            Console.WriteLine("Duration: " + duration);
         }
 
         public void bpmChange(int click)
@@ -73,12 +81,10 @@ namespace cShrp1
             {
                 bpm += click;
                 bpmToDuration();
-                Console.WriteLine("BPM: " + bpm);
             }
             else
             {
                 bpm = 350;
-                Console.WriteLine("Throw exception");
             }
         }
 

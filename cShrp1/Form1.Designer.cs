@@ -83,9 +83,9 @@
             // 
             // clock
             // 
-            this.clock.Enabled = true;
-            this.clock.Interval = 1000;
-            this.clock.Tick += new System.EventHandler(this.Clock_Tick);
+            //this.clock.Enabled = true;
+            //this.clock.Interval = 1000;
+            //this.clock.Tick += new System.EventHandler(this.Clock_Tick);
             // 
             // BtnTap
             // 
