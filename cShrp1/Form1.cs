@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Drawing;
 using System.Threading;
 using System.Windows.Forms;
@@ -15,134 +16,93 @@ namespace cShrp1
         private int num = 0;
         private System.Diagnostics.Stopwatch watch = new System.Diagnostics.Stopwatch();
         private bool beenTapped = false;
-        private bool red = false;
-        private bool alterTempo = false;
-        private bool up = false;
+        private bool open = true;
+        private delegate void textMonitor();
+        private delegate void flasher();
         
 
         public Form1()
         {
             InitializeComponent();
             gnome = new Metro();
+            flashy.Text = "BPM: " + gnome.BPM;
+
         }
 
         private void Form1_Load(object sender, EventArgs e)
         {
             clock.Interval = gnome.BPM;
-            flashy.Text= "BPM: " + gnome.BPM;
         }
 
         //
         //button Up 
         //
-
-        private void BtnUp_MouseUp(object sender, MouseEventArgs e)
-        {
-            alterTempo = false;
-        }
         private void BtnUp_MouseDown(object sender, MouseEventArgs e)
         {
-            alterTempo = true;
-            up = true;
-            Thread thr = new Thread(runs);
+            gnome.AlterBPM = true;//set altering metronome tempo to true
+            Thread thr = new Thread(gnome.BPMUp);
+            var t = new Thread(new ThreadStart(threadStuff));
+            t.Start();
             thr.Start();
         }
+        private void BtnUp_MouseUp(object sender, MouseEventArgs e)
+        {
+            gnome.AlterBPM = false;//set altering metronome tempo to false
+        }
+
         //
         //Button Down
         //
-        private void BtnDown_MouseUp(object sender, MouseEventArgs e)
-        {
-            alterTempo = false;
-
-        }
-
         private void BtnDown_MouseDown(object sender, MouseEventArgs e)
         {
-            alterTempo = true;
-            up = false;
-            Thread thr = new Thread(runs);
+            gnome.AlterBPM = true; //set altering metronome tempo to true
+            Thread thr = new Thread(gnome.BPMDown);
+            var t = new Thread(new ThreadStart(threadStuff));
+            t.Start();
             thr.Start();
         }
-        
-        public void colorChange()
-        {
-            
-            flashy.BackColor = gnome.flashMe();
-        }
+        private void BtnDown_MouseUp(object sender, MouseEventArgs e) { gnome.AlterBPM = false; }//set altering metronome tempo to false
 
-
-        private void Clock_Tick(object sender, EventArgs e)
-        {
-            //clock.Enabled = true;  
-            //makePartyLights();
-            //clock.Interval = gnome.Duration;
-            //gnome.click();
-            //colorChange();
-            //flashy.Text = Convert.ToString("BPM: " + gnome.BPM);
-            
-        }
-
-
-        private void runs()
-        {
-            int count = 0;
-            int bpm = gnome.BPM;
-            while (alterTempo)
+        //
+        //For flashy/bpm label update allows for threading of the label on form1
+        //
+        public void threadFlash()
+        {while (gnome.On)
             {
-                if (up)
-                {
-                    Console.WriteLine("in up");
-                    if (count < 25)
-                    {
-                        count++;
-                    }
-                }
+                if (!open)
+                { flashy.Invoke(new flasher(updateColor)); }
                 else
                 {
-                    if (count > -25)
-                    {
-                        Console.WriteLine("in down");
-                        count--;
-                    }
+                    break;
                 }
-                    gnome.bpmChange(count);
-                    Thread.Sleep(300);
             }
-            up = false;
         }
 
+        public void updateColor() { flashy.BackColor = gnome.C;}
+        public void threadStuff() { while (gnome.AlterBPM) { flashy.Invoke(new textMonitor(updateFlashy)); } }
+        public void updateFlashy() { flashy.Text = "BPM: " + gnome.BPM; }
+
+        //
+        //TapTempo 
+        //
         private void BtnTap_Click(object sender, EventArgs e)
         {
-            if (watch.IsRunning)
-            {
-                watch.Stop();
-                String value = watch.Elapsed.ToString().Substring(6);
-                double newVal = Convert.ToDouble(value);
-                if (newVal < 3.0)
-                {
-                    times[num] = newVal;
-                    watch.Reset();
-                    gnome.tap(times);
-                }
-                watch.Reset();
-                //after certain amount of time disregaud old
-                //catch any within certain time linmit before refering to tap tepo
-            }
-            else
-            {
-                watch.Start();
-            }
-
-        }
-        private void updateTempo()
-        {
-
+            gnome.tap1();
+            flashy.Text = "BPM: "+ gnome.BPM;
         }
 
-        private void BtnStrStp_Click(object sender, EventArgs e)
-        {
-            Console.WriteLine("HERE");
+        private void BtnStrStp_Click(object sender, EventArgs e){
+            var flashThread = new Thread(new ThreadStart(threadFlash));
             gnome.onOff();
+            if (gnome.On)
+            {
+                flashThread.Start();
+            }
+        }
+
+        private void Form1_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            open = false;
         }
     }
 }

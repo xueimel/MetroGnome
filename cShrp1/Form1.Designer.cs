@@ -77,15 +77,8 @@
             this.flashy.Font = new System.Drawing.Font("Snap ITC", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.flashy.Location = new System.Drawing.Point(211, 236);
             this.flashy.Name = "flashy";
-            this.flashy.Size = new System.Drawing.Size(117, 27);
+            this.flashy.Size = new System.Drawing.Size(0, 27);
             this.flashy.TabIndex = 2;
-            this.flashy.Text = "BPM: 90";
-            // 
-            // clock
-            // 
-            //this.clock.Enabled = true;
-            //this.clock.Interval = 1000;
-            //this.clock.Tick += new System.EventHandler(this.Clock_Tick);
             // 
             // BtnTap
             // 
@@ -124,6 +117,7 @@
             this.Name = "Form1";
             this.Text = "MetroGnome";
             this.TransparencyKey = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(128)))), ((int)(((byte)(255)))));
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
             this.Load += new System.EventHandler(this.Form1_Load);
             this.ResumeLayout(false);
             this.PerformLayout();

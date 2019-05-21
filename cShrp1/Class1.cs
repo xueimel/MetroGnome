@@ -10,17 +10,24 @@ namespace cShrp1
 {
     class Metro 
     {
-
+        private double[] times = new double[24];
+        private int timesCollected = 0;
         private int bpm;
         private int duration;
         private double old;
         private bool color1 = false;
-        private System.Timers.Timer clock;
+        private bool alter = false;
+        private bool on = false;
+        private bool increase;
+        private Color c;
+        private System.Diagnostics.Stopwatch watch = new System.Diagnostics.Stopwatch(); //controls elapsed time for tapTempo
+        private System.Diagnostics.Stopwatch elapsedClock = new System.Diagnostics.Stopwatch(); //monitors duration of tapTemp
+        private System.Timers.Timer clock; //controls the clicktrack
 
         public Metro()
         {
             bpm = 60;
-            bpmToDuration();
+            BPMToDuration();
             clock = new System.Timers.Timer();
             startClock();
         }
@@ -34,10 +41,29 @@ namespace cShrp1
             get { return duration;}
             set { duration = value;}
         }
-       
-
+      
+        public bool AlterBPM
+        {
+            get { return alter; }
+            set { alter = value; }
+        }
+        public bool Increase
+        {
+            get { return increase; }
+            set { increase = value; }
+        }
+        public bool On {get { return on; }  }
+        public Color C {get { return c; }  }
+   
+        public void onOff()
+        {
+            on = on ? false : true;
+            clock.Enabled = clock.Enabled ? false : true; 
+        }
         private void startClock()
         {
+            Console.WriteLine("Durations: " + duration);
+            Console.WriteLine("BPM :" + bpm);
             clock.Interval = duration;
             clock.AutoReset = true;
             clock.Elapsed += new ElapsedEventHandler(clockTick);
@@ -45,51 +71,107 @@ namespace cShrp1
         }
         private void clockTick(object source, ElapsedEventArgs e)
         {
-                click();
-                //clock.Interval = duration;
-        }
-        public void onOff()
-        {
-            clock.Enabled = clock.Enabled ? false : true; 
+            click();
+            if (AlterBPM) { clock.Interval = duration; } 
         }
         public void click()
         {
-                SoundPlayer player = new SoundPlayer("C:/Users/Landon Lemieux/Desktop/click.wav");
-                player.PlaySync();
-                //flashMe();
+            SoundPlayer player = new SoundPlayer("C:/Users/Landon Lemieux/Desktop/click.wav");
+            player.PlaySync();
+            flashMe();
         }
 
-        public Color flashMe()
+        private void flashMe()
         {
-            Color c;
             c = color1 ? Color.Blue : Color.Red;
             color1 = color1 ? false : true;
-
-            return c;
         }
-        private void bpmToDuration()
+
+        private void BPMToDuration()
         {
             double bps = (double)bpm / 60.0;
             double temp = (1000 / bps);
             temp = Math.Round(temp);
             duration = (int)temp;
         }
+        private void durationToBPM()
+        {
+            double temp = 1000.0 / (double) duration;
+            temp *= 60;
+            temp = Math.Round(temp);
+            bpm = (int)temp;
+        }
 
-        public void bpmChange(int click)
-        {   
-            if (bpm < 350)
+        public void BPMUp()
+        {
+            int count = 0;
+            while (alter)
             {
-                bpm += click;
-                bpmToDuration();
+                if (count <= 25){ count++; }
+                bpm += count;
+                BPMToDuration();
+                Thread.Sleep(300);
+                Console.WriteLine("IN UP");
             }
-            else
+        }
+        public void BPMDown()
+        {
+            int count = 0;
+            while (alter)
             {
-                bpm = 350;
+                if (count >= -25){count--;}
+                bpm -= count;
+                BPMToDuration();
+                Thread.Sleep(300);
+                Console.WriteLine("IN DOWN");
             }
         }
 
+        public void tap1() {
+            if (watch.IsRunning)
+            {
+                watch.Stop();
+                elapsedClock.Reset();
+                String value = watch.Elapsed.ToString().Substring(6);
+                double newVal = Convert.ToDouble(value);
+                if (newVal < 3.0)
+                {
+                    times[timesCollected] = newVal;
+                    watch.Reset();
+                    tap();
+                    timesCollected++;
+                }
+                if (timesCollected == 5)
+                {
+                    cleanUpArray();
+                }
+                watch.Reset();
+                //after certain amount of time disregaud old
+                //catch any within certain time linmit before refering to tap tepo
+            }else {
+                watch.Start();
+                if(timesCollected == 0)
+                {
+                    elapsedClock.Start();
+                    Thread monitor = new Thread(clockMonitor);
+                    AlterBPM = true;
+                }
+            }
+        }
+        private void clockMonitor()
+        {
+            while(elapsedClock.ElapsedMilliseconds < 5000)
+            { Thread.Sleep(1000); }
+            cleanUpArray();
+        }
 
-        public void tap(double [] times)
+        private void cleanUpArray()
+        {
+            Array.Clear(times, 0, times.Length);
+            timesCollected = 0;
+            AlterBPM = false; //qustionable
+        }
+        private void tap()
         {
             //get average 2+ taps
             //could be many taps account for up to 4?
@@ -98,25 +180,22 @@ namespace cShrp1
                 old = times[0];
             }
             double fin=0.0;
-            //System.TimeSpan new;
+
             foreach (double t in times)
-            { if (t != 0) {
-                fin = (old + t) / 2;
-                old = fin;
-            }
+            {
+                Console.WriteLine(t);
+                if (t != 0)
+                {
+                    fin = (old + t) / 2;
+                    old = fin;
+                }
             }
             fin = fin * 1000;
             duration = Convert.ToInt32(fin);
-            durationToBpm();
-
-        }
-        private void durationToBpm()
-        {
-            double temp = 1000.0 / (double) duration;
-            temp *= 60;
-            temp = Math.Round(temp);
-            bpm = (int)temp;
-
+            Console.WriteLine("Durations: " + duration);
+            Console.WriteLine("BPM :" + bpm);
+            durationToBPM();
+            clock.Interval = duration;
         }
     }
 }
